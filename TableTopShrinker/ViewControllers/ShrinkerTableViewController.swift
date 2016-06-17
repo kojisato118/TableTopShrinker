@@ -44,10 +44,8 @@ class ShrinkerTableViewController: UIViewController, UITableViewDelegate, UITabl
         self.navigationController?.navigationBar.barTintColor = UIColor(colorLiteralRed: 1, green: 1, blue: 1, alpha: 0.5)
         self.navigationController?.navigationBar.translucent = true
         self.navigationController?.navigationBar.alpha = barAlpha
-        // http://qiita.com/mochizukikotaro/items/a4405701dcc706fd643e
-        self.navigationController?.navigationBar.setBackgroundImage(UIImage(), forBarMetrics: .Default)
-        self.navigationController?.navigationBar.shadowImage = UIImage()
         
+        self.setNavigationbarHidden(true)
         self.setTitleAlpha(0)
     }
 
@@ -83,6 +81,8 @@ class ShrinkerTableViewController: UIViewController, UITableViewDelegate, UITabl
     
     // MARK: - UIScrollViewDelegate
     func scrollViewDidScroll(scrollView: UIScrollView) {
+        // 値変わらないやつを何度も処理走らせるのきもいなあ
+        
         if self.tableView.contentOffset.y * -1 >= defaultImageHeight{
             // TableViewをしたに引っ張った時にImageViewのサイズをその分上げる
             self.maskView.hidden = true
@@ -93,14 +93,11 @@ class ShrinkerTableViewController: UIViewController, UITableViewDelegate, UITabl
             // TableViewを上にスクロールするとき
             if self.tableView.contentOffset.y + self.topLayoutGuideView.frame.origin.y >= 0{
                 // TableViewのコンテンツがNavigationbarより上に来た時はNavigationbarを表示
-                self.navigationController!.navigationBar.setBackgroundImage(nil, forBarMetrics: .Default)
-                self.navigationController!.navigationBar.shadowImage = nil
-                
+                self.setNavigationbarHidden(false)
                 return
             }
             
-            self.navigationController!.navigationBar.setBackgroundImage(UIImage(), forBarMetrics: .Default)
-            self.navigationController!.navigationBar.shadowImage = UIImage()
+            self.setNavigationbarHidden(true)
             
             // スクロール速度より若干遅めに画像が移動する
             let diff = self.tableView.contentOffset.y + defaultImageHeight
@@ -115,6 +112,18 @@ class ShrinkerTableViewController: UIViewController, UITableViewDelegate, UITabl
     }
     
     // MARK: - 
+    func setNavigationbarHidden(hidden : Bool){
+        // http://qiita.com/mochizukikotaro/items/a4405701dcc706fd643e
+
+        if hidden{
+            self.navigationController?.navigationBar.setBackgroundImage(UIImage(), forBarMetrics: .Default)
+            self.navigationController?.navigationBar.shadowImage = UIImage()
+        }else{
+            self.navigationController!.navigationBar.setBackgroundImage(nil, forBarMetrics: .Default)
+            self.navigationController!.navigationBar.shadowImage = nil
+        }
+    }
+    
     func setTitleAlpha(alpha : CGFloat){
         let selectedAttributes = [NSForegroundColorAttributeName : UIColor(red:0, green:0, blue:0, alpha:alpha)]
         self.navigationController?.navigationBar.titleTextAttributes = selectedAttributes
